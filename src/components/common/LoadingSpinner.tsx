@@ -2,6 +2,9 @@ import { cn } from '@/lib/utils';
 
 /**
  * Loading Spinner Component
+ * Offline-First audit:
+ * - Activity indicator for indeterminate loading (use sparingly)
+ * - Should be used only when skeleton screens are not appropriate
  *
  * Prefer skeleton screens for content that will have predictable structure.
  * Use spinner for:

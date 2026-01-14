@@ -134,6 +134,8 @@ function QuizOption({
  * - Each option has role="radio" with aria-checked
  * - Keyboard navigation support
  * - Feedback announced to screen readers
+ *
+ * - QuizView: role="radiogroup", role="radio", aria-checked
  */
 export function MCQQuestion({
   question,

@@ -18,3 +18,21 @@ export type { MarkdownRendererProps } from './MarkdownRenderer';
 
 export { LessonViewer } from './LessonViewer';
 export type { LessonViewerProps } from './LessonViewer';
+
+export { ContentStatusBadge } from './ContentStatusBadge';
+export type { ContentStatusBadgeProps } from './ContentStatusBadge';
+
+export { ComingSoonBanner } from './ComingSoonBanner';
+export type { ComingSoonBannerProps } from './ComingSoonBanner';
+
+export { ArchivedContentNotice } from './ArchivedContentNotice';
+export type { ArchivedContentNoticeProps } from './ArchivedContentNotice';
+
+export { LockOverlay } from './LockOverlay';
+export type { LockOverlayProps } from './LockOverlay';
+
+export { UnlockProgress } from './UnlockProgress';
+export type { UnlockProgressProps } from './UnlockProgress';
+
+export { PrerequisiteList } from './PrerequisiteList';
+export type { PrerequisiteListProps } from './PrerequisiteList';
