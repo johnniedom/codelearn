@@ -27,6 +27,7 @@ import {
   AlertCircle,
   Code,
   Play,
+  Upload,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -43,6 +44,7 @@ import {
 
 import { MetadataForm } from '@/components/cms/editors/MetadataForm';
 import { TestCaseEditor, createEmptyTestCase } from '@/components/cms/editors';
+import { PublishDialog } from '@/components/cms/PublishDialog';
 
 import {
   createDraft,
@@ -260,6 +262,7 @@ export default function ExerciseEditor() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   // Refs
   const autoSaverRef = useRef<ReturnType<typeof createAutoSaver> | null>(null);
@@ -543,6 +546,17 @@ export default function ExerciseEditor() {
             <Save className="h-4 w-4 mr-2" aria-hidden="true" />
             Save
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPublishDialogOpen(true)}
+            disabled={saveStatus !== 'saved' || !draft}
+            className="min-h-[44px] sm:min-h-0"
+          >
+            <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
+            Publish
+          </Button>
         </div>
       </div>
 
@@ -723,6 +737,14 @@ export default function ExerciseEditor() {
           </CardContent>
         </Card>
       )}
+
+      <PublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        draftId={draft?.id ?? ''}
+        contentType="exercise"
+        title={editorState.title}
+      />
     </div>
   );
 }

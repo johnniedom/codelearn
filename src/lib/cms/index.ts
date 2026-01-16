@@ -28,6 +28,7 @@ export type { AvatarResult, AvatarValidation } from './avatar-service';
 export {
   createDraft,
   getDraft,
+  getDraftWithAssets,
   getAuthorDrafts,
   updateDraft,
   updateDraftStatus,
@@ -74,3 +75,28 @@ export {
 } from './asset-service';
 
 export type { AssetValidation } from './asset-service';
+
+// =============================================================================
+// Publish Service
+// =============================================================================
+
+export {
+  validateDraftForPublish,
+  prepareDraftForPublish,
+  generateManifest,
+  createPackageZip,
+  publishDraft,
+  publishToHub,
+  getPackageFilename,
+  createDownloadablePackage,
+  estimatePackageSize,
+} from './publish-service';
+
+export type {
+  PublishableContent,
+  PublishableContentType,
+  AssetReference,
+  PackageManifest,
+  ValidationResult,
+  PublishResult,
+} from './publish-service';

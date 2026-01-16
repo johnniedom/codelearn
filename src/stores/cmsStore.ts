@@ -15,6 +15,7 @@ import { create } from 'zustand';
 // =============================================================================
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type PublishStatus = 'idle' | 'validating' | 'preparing' | 'publishing' | 'success' | 'error';
 
 interface CMSState {
   // Current editing state
@@ -26,6 +27,11 @@ interface CMSState {
   // UI state
   sidebarCollapsed: boolean;
   previewVisible: boolean;
+
+  // Publish state
+  publishStatus: PublishStatus;
+  publishProgress: number; // 0-100
+  publishError: string | null;
 }
 
 interface CMSActions {
@@ -38,6 +44,12 @@ interface CMSActions {
   // UI toggles
   toggleSidebar: () => void;
   togglePreview: () => void;
+
+  // Publish actions
+  setPublishStatus: (status: PublishStatus) => void;
+  setPublishProgress: (progress: number) => void;
+  setPublishError: (error: string | null) => void;
+  resetPublishState: () => void;
 
   // Reset state
   reset: () => void;
@@ -56,6 +68,9 @@ const initialState: CMSState = {
   lastSavedAt: null,
   sidebarCollapsed: false,
   previewVisible: true,
+  publishStatus: 'idle',
+  publishProgress: 0,
+  publishError: null,
 };
 
 // =============================================================================
@@ -106,6 +121,30 @@ export const useCMSStore = create<CMSStore>()((set) => ({
 
   togglePreview: () => {
     set((state) => ({ previewVisible: !state.previewVisible }));
+  },
+
+  // ==========================================================================
+  // Publish Actions
+  // ==========================================================================
+
+  setPublishStatus: (status) => {
+    set({ publishStatus: status });
+  },
+
+  setPublishProgress: (progress) => {
+    set({ publishProgress: progress });
+  },
+
+  setPublishError: (error) => {
+    set({ publishError: error });
+  },
+
+  resetPublishState: () => {
+    set({
+      publishStatus: 'idle',
+      publishProgress: 0,
+      publishError: null,
+    });
   },
 
   // ==========================================================================

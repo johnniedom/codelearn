@@ -28,6 +28,7 @@ import {
   Check,
   AlertCircle,
   FileText,
+  Upload,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -44,6 +45,7 @@ import { MetadataForm } from '@/components/cms/editors/MetadataForm';
 import { LearningObjectiveEditor } from '@/components/cms/editors/LearningObjectiveEditor';
 import { MarkdownEditor } from '@/components/cms/editors/MarkdownEditor';
 import { MarkdownRenderer } from '@/components/content/MarkdownRenderer';
+import { PublishDialog } from '@/components/cms/PublishDialog';
 
 import {
   createDraft,
@@ -196,6 +198,7 @@ export default function LessonEditor() {
     }
     return true;
   });
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   // Refs
   const autoSaverRef = useRef<ReturnType<typeof createAutoSaver> | null>(null);
@@ -499,6 +502,17 @@ export default function LessonEditor() {
             <span className="hidden sm:inline">Save</span>
             <span className="sm:hidden">Save</span>
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPublishDialogOpen(true)}
+            disabled={saveStatus !== 'saved' || !draft}
+            className="min-h-[44px] sm:min-h-0"
+          >
+            <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
+            Publish
+          </Button>
         </div>
       </div>
 
@@ -596,6 +610,14 @@ export default function LessonEditor() {
           )}
         </div>
       </div>
+
+      <PublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        draftId={draft?.id ?? ''}
+        contentType="lesson"
+        title={editorState.title}
+      />
     </div>
   );
 }

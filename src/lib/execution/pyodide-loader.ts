@@ -20,7 +20,7 @@ import type {
 } from './types';
 
 // Pyodide CDN URL - cached by service worker after first load
-const PYODIDE_CDN_URL = 'https://cdn.jsdelivr.net/pyodide/v0.27.4/full/';
+const PYODIDE_CDN_URL = 'https://cdn.jsdelivr.net/pyodide/v0.29.1/full/';
 
 // Estimated Pyodide size for progress calculation
 const ESTIMATED_PYODIDE_SIZE_BYTES = 25 * 1024 * 1024; // ~25MB

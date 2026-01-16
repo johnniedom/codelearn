@@ -14,7 +14,8 @@
  */
 
 import { db } from '@/lib/db';
-import type { ContentDraft, ContentType, DraftStatus } from '@/lib/db';
+import type { ContentDraft, ContentType, DraftStatus, LocalAsset } from '@/lib/db';
+import { getAsset } from './asset-service';
 
 /** Auto-save debounce time in ms */
 const AUTO_SAVE_DELAY = 2000;
@@ -309,6 +310,70 @@ export function createAutoSaver(
   };
 
   return { save, flush, cancel };
+}
+
+// =============================================================================
+// Draft with Assets
+// =============================================================================
+
+/**
+ * Get draft with all referenced assets
+ *
+ * Fetches the draft and extracts asset references from the content.
+ * Returns both the draft and the asset metadata.
+ *
+ * @param id - The draft ID
+ * @returns Draft with assets or undefined if not found
+ */
+export async function getDraftWithAssets(id: string): Promise<{
+  draft: ContentDraft;
+  assets: LocalAsset[];
+} | undefined> {
+  // 1. Get the draft
+  const draft = await getDraft(id);
+  if (!draft) {
+    return undefined;
+  }
+
+  // 2. Parse the content JSON to find asset references
+  const assetIds = extractAssetIds(draft.content);
+
+  // 3. Fetch each referenced asset's metadata
+  const assetPromises = assetIds.map((assetId) => getAsset(assetId));
+  const assetResults = await Promise.all(assetPromises);
+
+  // Filter out undefined (assets that no longer exist)
+  const assets = assetResults.filter((asset): asset is LocalAsset => asset !== undefined);
+
+  // 4. Return both
+  return { draft, assets };
+}
+
+/**
+ * Extract asset IDs from content JSON
+ *
+ * Searches for UUID patterns in the content that represent asset references.
+ * Assets are typically referenced by their ID in image blocks, file attachments, etc.
+ *
+ * @param content - JSON stringified content
+ * @returns Array of unique asset IDs found in the content
+ */
+function extractAssetIds(content: string): string[] {
+  if (!content) {
+    return [];
+  }
+
+  // UUID v4 pattern to find asset IDs in the content
+  // Asset IDs follow the format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+  const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi;
+
+  const matches = content.match(uuidPattern);
+  if (!matches) {
+    return [];
+  }
+
+  // Return unique IDs only
+  return [...new Set(matches)];
 }
 
 // =============================================================================
