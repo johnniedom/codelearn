@@ -36,3 +36,11 @@ export type { UnlockProgressProps } from './UnlockProgress';
 
 export { PrerequisiteList } from './PrerequisiteList';
 export type { PrerequisiteListProps } from './PrerequisiteList';
+
+export { AuthorCard } from './AuthorCard';
+export type { AuthorCardProps } from './AuthorCard';
+
+export { ExerciseLink } from './ExerciseLink';
+
+export { BloomLevelBadge } from './BloomLevelBadge';
+export type { BloomLevel, BloomLevelBadgeProps } from './BloomLevelBadge';

@@ -134,7 +134,8 @@ body {
 
 /* ==========================================================================
    Accessibility: Focus States
-   Per plan: 2px outline for visible focus states
+   Using box-shadow (ring) instead of outline for better mobile rendering.
+   Outline can appear jagged on mobile browsers; shadow provides a smoother appearance.
    ========================================================================== */
 
 :focus {
@@ -142,8 +143,8 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-border-focus);
 }
 
 /* Interactive elements should have visible focus */
@@ -153,8 +154,8 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-border-focus);
 }
 
 /* ==========================================================================
@@ -241,22 +242,6 @@ select {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-/* Skip link for keyboard navigation */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  padding: 8px 16px;
-  z-index: 1000;
-  text-decoration: none;
-}
-
-.skip-link:focus {
-  top: 0;
 }
 
 /* ==========================================================================

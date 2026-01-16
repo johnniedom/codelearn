@@ -302,7 +302,8 @@ export function CodeEditor({
     if (readOnlyRegions.length > 0 && !readOnly) {
       applyReadOnlyRegions(view, readOnlyRegions);
     }
-  }, [initialCode, language, readOnly, darkTheme, minHeight, maxHeight, readOnlyRegions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initialCode intentionally excluded to prevent recreation on every keystroke
+  }, [language, readOnly, darkTheme, minHeight, maxHeight, readOnlyRegions]);
 
   /**
    * Apply read-only regions to the editor

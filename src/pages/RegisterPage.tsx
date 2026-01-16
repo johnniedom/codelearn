@@ -76,6 +76,7 @@ export const RegisterPage: React.FC = () => {
         profileIcon: data.profileIcon,
         profileColor: data.profileColor,
         gradeLevel: data.gradeLevel,
+        role: data.role,
         lastUsedAt: now,
         accountStatus: 'active' as const,
         createdAt: now,

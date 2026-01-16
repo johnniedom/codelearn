@@ -150,6 +150,17 @@ export const LoginPage: React.FC = () => {
   const handlePatternComplete = async (patternInput: number[]) => {
     if (!userId || !sessionId) return;
 
+    // Early validation: ensure pattern is valid before making verification call
+    if (
+      !Array.isArray(patternInput) ||
+      patternInput.length < 4 ||
+      patternInput.some((p) => !Number.isInteger(p) || p < 0 || p > 8)
+    ) {
+      setError('Invalid pattern. Please try again.');
+      setPattern([]);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -199,6 +210,8 @@ export const LoginPage: React.FC = () => {
 
   // Handle back to profile select
   const handleBackToProfiles = () => {
+    // Clear any partial auth state to ensure ProfileSelectPage doesn't redirect
+    useAuthStore.getState().clearSession();
     navigate('/profiles', { replace: true });
   };
 

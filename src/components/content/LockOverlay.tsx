@@ -67,7 +67,7 @@ export function LockOverlay({
       {onViewPrerequisites && (
         <button
           onClick={onViewPrerequisites}
-          className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+          className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
           type="button"
         >
           View Prerequisites

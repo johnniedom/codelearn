@@ -227,7 +227,7 @@ export function AudioPlayer({
           'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white',
           'transition-all duration-fast',
           'hover:bg-primary-light',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           'disabled:cursor-not-allowed disabled:opacity-50'
         )}
         aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -268,7 +268,7 @@ export function AudioPlayer({
           'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full',
           'text-text-muted hover:text-text',
           'transition-colors duration-fast',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus'
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-background'
         )}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
         aria-pressed={isMuted}

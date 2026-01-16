@@ -343,6 +343,15 @@ export async function verifyPattern(
   userId: string,
   verifier: PatternVerifier
 ): Promise<boolean> {
+  // Validate pattern input before processing
+  if (
+    !Array.isArray(pattern) ||
+    pattern.length === 0 ||
+    pattern.some((p) => !Number.isInteger(p) || p < 0 || p > 8)
+  ) {
+    return false;
+  }
+
   // Quick check: if point count differs, pattern can't match
   if (pattern.length !== verifier.pointCount) {
     return false;

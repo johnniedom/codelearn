@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { LessonViewer } from '@/components/content';
+import { LessonViewer, ExerciseLink } from '@/components/content';
 import { PageSkeleton } from '@/components/common/LoadingSkeleton';
 import { loadLesson, getAssetUrl, recordLessonCompletion, getCompletedLessonIds } from '@/lib/content';
 import { useAuthStore } from '@/stores/authStore';
@@ -11,24 +11,56 @@ import {
   SAMPLE_LESSON,
   SAMPLE_LESSON_2,
   SAMPLE_LESSON_3,
+  SAMPLE_LESSON_4,
+  SAMPLE_LESSON_5,
+  SAMPLE_LESSON_6,
+  SAMPLE_LESSON_7,
+  SAMPLE_LESSON_8,
+  SAMPLE_LESSON_9,
+  SAMPLE_LESSON_10,
+  SAMPLE_LESSON_11,
+  SAMPLE_LESSON_12,
+  SAMPLE_LESSON_13,
+  SAMPLE_LESSON_14,
+  SAMPLE_LESSON_15,
   SAMPLE_COURSE_SLUG,
 } from '@/data/sample-course';
+import { PYTHON_HELLO_WORLD, PYTHON_VARIABLES } from '@/data/sample-exercises';
 
 /**
  * Get sample lesson by ID
  * Returns the matching sample lesson or null if not found
  */
-function getSampleLesson(lessonId: string) {
-  switch (lessonId) {
-    case 'les-001':
-      return SAMPLE_LESSON;
-    case 'les-002':
-      return SAMPLE_LESSON_2;
-    case 'les-003':
-      return SAMPLE_LESSON_3;
-    default:
-      return null;
-  }
+function getSampleLesson(lessonId: string): Lesson | null {
+  const lessons: Record<string, Lesson> = {
+    'les-001': SAMPLE_LESSON,
+    'les-002': SAMPLE_LESSON_2,
+    'les-003': SAMPLE_LESSON_3,
+    'les-004': SAMPLE_LESSON_4,
+    'les-005': SAMPLE_LESSON_5,
+    'les-006': SAMPLE_LESSON_6,
+    'les-007': SAMPLE_LESSON_7,
+    'les-008': SAMPLE_LESSON_8,
+    'les-009': SAMPLE_LESSON_9,
+    'les-010': SAMPLE_LESSON_10,
+    'les-011': SAMPLE_LESSON_11,
+    'les-012': SAMPLE_LESSON_12,
+    'les-013': SAMPLE_LESSON_13,
+    'les-014': SAMPLE_LESSON_14,
+    'les-015': SAMPLE_LESSON_15,
+  };
+  return lessons[lessonId] || null;
+}
+
+/**
+ * Get exercises associated with a lesson
+ */
+function getExercisesForLesson(lessonId: string) {
+  const exerciseMap: Record<string, typeof PYTHON_HELLO_WORLD[]> = {
+    'les-001': [PYTHON_HELLO_WORLD, PYTHON_VARIABLES], // Variables lesson
+    // Add more mappings as needed
+  };
+  return exerciseMap[lessonId] || [];
 }
 
 /**
@@ -192,13 +224,40 @@ export default function LessonPage() {
   const assetBaseUrl = getAssetUrl(courseSlug || SAMPLE_COURSE_SLUG, '');
 
   return (
-    <LessonViewer
-      lesson={lesson}
-      assetBaseUrl={assetBaseUrl}
-      isCompleted={isCompleted}
-      onBack={handleBack}
-      onNext={lesson.navigation.nextLessonId ? handleNext : undefined}
-      onComplete={handleComplete}
-    />
+    <>
+      <LessonViewer
+        lesson={lesson}
+        assetBaseUrl={assetBaseUrl}
+        isCompleted={isCompleted}
+        onBack={handleBack}
+        onNext={lesson.navigation.nextLessonId ? handleNext : undefined}
+        onComplete={handleComplete}
+      />
+
+      {/* Practice Exercises */}
+      {(() => {
+        const exercises = getExercisesForLesson(lessonId || '');
+        if (exercises.length === 0) return null;
+
+        return (
+          <section className="mt-8 px-4">
+            <h2 className="text-lg font-semibold text-text mb-4">Practice Exercises</h2>
+            <div className="space-y-3">
+              {exercises.map((exercise) => (
+                <ExerciseLink
+                  key={exercise.id}
+                  exerciseId={exercise.id}
+                  title={typeof exercise.title === 'string' ? exercise.title : exercise.title.default}
+                  courseSlug={courseSlug || 'python-basics'}
+                  moduleId={moduleId || 'mod-001'}
+                  difficulty={exercise.difficulty}
+                  estimatedMinutes={exercise.estimatedMinutes}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+    </>
   );
 }

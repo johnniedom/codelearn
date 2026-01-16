@@ -5,5 +5,6 @@
  */
 
 export { useAuthStore, default as authStore } from './authStore';
+export { useCMSStore, default as cmsStore, selectSaveState, selectUIState } from './cmsStore';
 export { useSyncStore, default as syncStore } from './syncStore';
 export { useUIStore, default as uiStore } from './uiStore';

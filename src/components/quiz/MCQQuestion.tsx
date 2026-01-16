@@ -96,7 +96,7 @@ function QuizOption({
         !disabled && 'cursor-pointer',
         disabled && 'cursor-not-allowed opacity-70',
         // Focus states
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2'
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background'
       )}
     >
       {/* Option letter indicator */}

@@ -109,7 +109,7 @@ export function LessonCard({
         !isLocked && [
           'cursor-pointer',
           'hover:border-border-focus hover:shadow-sm',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           'active:scale-[0.99]',
         ],
         // Locked state styling

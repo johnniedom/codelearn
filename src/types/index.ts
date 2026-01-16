@@ -17,7 +17,25 @@ export type {
   Notification,
   DeviceState,
   AuditLog,
+  AuthorProfile,
+  AuthorActivity,
+  ContentDraft,
+  ContentIndexEntry,
+  LocalAsset,
+  ContentType,
+  DraftStatus,
+  AssetType,
 } from '@/lib/db';
+
+// Re-export CMS types (alternative import path)
+export type {
+  ContentType as CMSContentType,
+  DraftStatus as CMSDraftStatus,
+  AssetType as CMSAssetType,
+  ContentDraft as CMSContentDraft,
+  ContentIndexEntry as CMSContentIndexEntry,
+  LocalAsset as CMSLocalAsset,
+} from './cms';
 
 // =============================================================================
 // Common Types

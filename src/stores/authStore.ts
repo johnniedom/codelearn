@@ -4,6 +4,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Profile, Session } from '@/lib/db';
 import { db } from '@/lib/db';
 import { getCredentialStatus, CREDENTIAL_WARNING_DAYS } from '@/lib/auth/crypto';
+import type { UserRole } from '@/types/roles';
+import { hasPermission, type Permission } from '@/lib/auth/permissions';
 
 /**
  * Authentication Store
@@ -65,6 +67,11 @@ interface AuthActions {
   updateCredentialStatus: () => Promise<void>;
   getCredentialExpiryDays: () => number | null;
   isCredentialExpiringSoon: () => boolean;
+
+  // Role helpers
+  hasRole: (role: UserRole) => boolean;
+  canAccessCMS: () => boolean;
+  hasPermission: (permission: Permission) => boolean;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -323,6 +330,11 @@ export const useAuthStore = create<AuthStore>()(
         const days = get().credentialStatus.daysRemaining;
         return days !== null && days <= CREDENTIAL_WARNING_DAYS && days > 0;
       },
+
+      // Role helpers
+      hasRole: (role) => get().profile?.role === role,
+      canAccessCMS: () => get().profile?.role === 'author',
+      hasPermission: (permission) => hasPermission(get().profile?.role, permission),
     }),
     {
       name: 'codelearn-auth',

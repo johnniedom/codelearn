@@ -188,12 +188,12 @@ export const PINInput = React.forwardRef<HTMLDivElement, PINInputProps>(
                 'rounded-lg border-2 bg-background',
                 'text-center text-xl font-semibold',
                 'transition-all duration-150',
-                // Focus styles
-                'focus:outline-none focus:ring-2 focus:ring-offset-2',
+                // Focus styles - using ring for better mobile rendering
+                'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background',
                 // Normal state
-                !error && !disabled && 'border-border focus:border-primary focus:ring-primary',
+                !error && !disabled && 'border-border focus:border-primary focus:ring-primary/70',
                 // Error state
-                error && 'border-error focus:border-error focus:ring-error',
+                error && 'border-error focus:border-error focus:ring-error/70',
                 // Disabled state
                 disabled && 'cursor-not-allowed opacity-50',
                 // Filled state indicator

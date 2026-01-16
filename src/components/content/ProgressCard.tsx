@@ -63,7 +63,7 @@ export function ProgressCard({
           'cursor-pointer',
           'transition-all duration-fast',
           'hover:border-border-focus hover:shadow-sm',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         ],
         className
       )}

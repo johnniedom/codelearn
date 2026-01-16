@@ -4,7 +4,13 @@ import { ArrowLeft, BookOpen, Clock, Users, ChevronDown, ChevronRight } from 'lu
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LessonCard } from '@/components/content';
+import {
+  LessonCard,
+  PrerequisiteList,
+  ContentStatusBadge,
+  AuthorCard,
+  BloomLevelBadge,
+} from '@/components/content';
 import { getCourseProgress, getCompletedLessonIds } from '@/lib/content';
 import { useAuthStore } from '@/stores/authStore';
 import type { Course, Module, LessonListItem, LessonStatus } from '@/types/content';
@@ -122,7 +128,7 @@ function ModuleAccordion({
           'flex w-full items-center justify-between gap-3 p-4 text-left',
           'transition-colors duration-fast',
           'hover:bg-surface-hover',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-inset'
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-inset focus-visible:ring-offset-surface'
         )}
       >
         <div className="flex flex-1 flex-col gap-1 overflow-hidden">
@@ -188,7 +194,7 @@ function ModuleAccordion({
                   'flex items-center justify-between rounded-lg border border-border bg-surface p-3',
                   'transition-all duration-fast',
                   'hover:border-border-focus hover:shadow-sm',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus'
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-background'
                 )}
               >
                 <div className="flex flex-col gap-1">
@@ -507,7 +513,7 @@ export default function CourseDetailPage() {
             'inline-flex items-center gap-2 text-sm text-text-muted',
             'transition-colors duration-fast',
             'hover:text-text',
-            'focus-visible:outline-none focus-visible:text-text'
+            'focus-visible:outline-none focus-visible:text-text focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-md'
           )}
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -530,6 +536,10 @@ export default function CourseDetailPage() {
               <Badge className={cn('text-xs', difficultyColors[course.difficulty])}>
                 {course.difficulty}
               </Badge>
+              {/* Show status badge for non-published content */}
+              {course.status && course.status !== 'published' && (
+                <ContentStatusBadge status={course.status} showLabel />
+              )}
             </div>
             <h1 className="text-2xl font-bold text-text">
               {getLocalizedText(course.title)}
@@ -593,10 +603,30 @@ export default function CourseDetailPage() {
                 className="flex items-start gap-2 text-sm text-text-muted"
               >
                 <span className="mt-0.5 text-success">&#10003;</span>
-                {getLocalizedText(objective.description)}
+                <div className="flex-1">
+                  <span>{getLocalizedText(objective.description)}</span>
+                  {objective.level && (
+                    <BloomLevelBadge
+                      level={objective.level}
+                      size="sm"
+                      className="ml-2"
+                    />
+                  )}
+                </div>
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* Prerequisites Section */}
+      {course.prerequisites && course.prerequisites.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold text-text mb-3">Prerequisites</h2>
+          <PrerequisiteList
+            prerequisites={course.prerequisites}
+            completedIds={new Set<string>()} // TODO: Get from user progress
+          />
         </section>
       )}
 
@@ -617,6 +647,22 @@ export default function CourseDetailPage() {
           ))}
         </div>
       </section>
+
+      {/* About the Author Section */}
+      {course.authors && course.authors.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold text-text mb-4">About the Author</h2>
+          <div className="space-y-4">
+            {course.authors.map((author, index) => (
+              <AuthorCard
+                key={author.email || index}
+                author={author}
+                variant="full"
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

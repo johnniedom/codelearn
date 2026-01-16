@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, BarChart2, Bell, Settings } from 'lucide-react';
+import { Home, BookOpen, BarChart2, Bell, Settings, PenTool } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getNotificationService, type NotificationEvent } from '@/lib/notifications';
 import { useAuthStore } from '@/stores/authStore';
@@ -83,7 +83,8 @@ interface NavItemProps {
 
 function NavItemButton({ item, isActive, badgeCount }: NavItemProps) {
   const Icon = item.icon;
-  const showBadge = item.showBadge && badgeCount && badgeCount > 0;
+  const showBadge = item.showBadge;
+  const displayCount = badgeCount ?? 0;
 
   return (
     <NavLink
@@ -95,7 +96,7 @@ function NavItemButton({ item, isActive, badgeCount }: NavItemProps) {
           // Transition for smooth state changes
           'transition-colors duration-fast',
           // Focus states for keyboard navigation
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           // Active state styling
           linkActive || isActive
             ? 'text-primary'
@@ -105,7 +106,7 @@ function NavItemButton({ item, isActive, badgeCount }: NavItemProps) {
       aria-current={isActive ? 'page' : undefined}
       aria-label={
         showBadge
-          ? `${item.ariaLabel}, ${badgeCount} unread`
+          ? `${item.ariaLabel}, ${displayCount} unread`
           : item.ariaLabel
       }
     >
@@ -113,10 +114,10 @@ function NavItemButton({ item, isActive, badgeCount }: NavItemProps) {
         <Icon className="h-5 w-5" aria-hidden="true" />
         {showBadge && (
           <span
-            className="absolute -right-1.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+            className="absolute -left-1.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
             aria-hidden="true"
           >
-            {badgeCount > 9 ? '9+' : badgeCount}
+            {displayCount > 9 ? '9+' : displayCount}
           </span>
         )}
       </span>
@@ -155,8 +156,11 @@ interface BottomNavProps {
  */
 export function BottomNav({ items = DEFAULT_NAV_ITEMS, className }: BottomNavProps) {
   const location = useLocation();
-  const { profile } = useAuthStore();
+  const { profile, canAccessCMS } = useAuthStore();
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Check if user can access CMS (authors only)
+  const showCMSLink = canAccessCMS();
 
   // Subscribe to notification count changes
   useEffect(() => {
@@ -216,6 +220,30 @@ export function BottomNav({ items = DEFAULT_NAV_ITEMS, className }: BottomNavPro
             badgeCount={item.showBadge ? unreadCount : undefined}
           />
         ))}
+        {showCMSLink && (
+          <NavLink
+            to="/cms"
+            className={({ isActive }) =>
+              cn(
+                // Base styles - 44px minimum touch target
+                'relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-1 rounded-lg px-4 py-2',
+                // Transition for smooth state changes
+                'transition-colors duration-fast',
+                // Focus states for keyboard navigation
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                // Active state styling
+                isActive
+                  ? 'text-primary'
+                  : 'text-text-muted hover:text-text'
+              )
+            }
+            aria-current={getIsActive('/cms') ? 'page' : undefined}
+            aria-label="Content management system"
+          >
+            <PenTool className="h-5 w-5" aria-hidden="true" />
+            <span className="text-xs font-medium">CMS</span>
+          </NavLink>
+        )}
       </div>
     </nav>
   );

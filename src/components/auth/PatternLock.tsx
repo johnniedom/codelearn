@@ -109,6 +109,9 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
     const [isDrawing, setIsDrawing] = React.useState(false);
     const [currentPos, setCurrentPos] = React.useState<{ x: number; y: number } | null>(null);
 
+    // Track if we're currently handling a touch sequence to prevent duplicate mouse events
+    const isTouchActiveRef = React.useRef(false);
+
     // Node styling
     const nodeRadius = size * 0.08;
     const activeNodeRadius = size * 0.1;
@@ -141,7 +144,7 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
         }
         return null;
       },
-      [size, nodeRadius, hitRadius]
+      [size, hitRadius]
     );
 
     // Handle drawing start
@@ -173,18 +176,30 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
 
         setCurrentPos(coords);
 
-        const hitNode = checkNodeHit(coords.x, coords.y, pattern);
-        if (hitNode !== null) {
-          setPattern((prev) => {
-            const newPattern = [...prev, hitNode];
-            onChange(newPattern);
+        // Check for node hit and update pattern atomically to prevent race conditions
+        // that could cause duplicate nodes when moving quickly or when both touch
+        // and mouse events fire for the same gesture
+        setPattern((prev) => {
+          const hitNode = checkNodeHit(coords.x, coords.y, prev);
+          if (hitNode !== null && !prev.includes(hitNode)) {
+            // Double-check for duplicates to guard against race conditions where
+            // touch and mouse events could both fire before state updates
             triggerHaptic();
-            return newPattern;
-          });
-        }
+            return [...prev, hitNode];
+          }
+          return prev;
+        });
       },
-      [isDrawing, disabled, mode, getSVGCoordinates, checkNodeHit, pattern, onChange]
+      [isDrawing, disabled, mode, getSVGCoordinates, checkNodeHit]
     );
+
+    // Sync pattern changes to parent via onChange - avoids race condition
+    // when calling onChange inside setState callback
+    React.useEffect(() => {
+      if (pattern.length > 0) {
+        onChange(pattern);
+      }
+    }, [pattern, onChange]);
 
     // Handle drawing end
     const handleEnd = React.useCallback(() => {
@@ -198,27 +213,32 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
       }
     }, [isDrawing, pattern, onComplete]);
 
-    // Mouse event handlers
+    // Mouse event handlers - skip if touch is active to prevent duplicate events
     const handleMouseDown = (e: React.MouseEvent) => {
+      if (isTouchActiveRef.current) return;
       e.preventDefault();
       handleStart(e.clientX, e.clientY);
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
+      if (isTouchActiveRef.current) return;
       handleMove(e.clientX, e.clientY);
     };
 
     const handleMouseUp = () => {
+      if (isTouchActiveRef.current) return;
       handleEnd();
     };
 
     const handleMouseLeave = () => {
+      if (isTouchActiveRef.current) return;
       handleEnd();
     };
 
-    // Touch event handlers
+    // Touch event handlers - set flag to block synthetic mouse events
     const handleTouchStart = (e: React.TouchEvent) => {
       e.preventDefault();
+      isTouchActiveRef.current = true;
       const touch = e.touches[0];
       handleStart(touch.clientX, touch.clientY);
     };
@@ -231,6 +251,10 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
 
     const handleTouchEnd = () => {
       handleEnd();
+      // Reset touch flag after a short delay to allow any queued mouse events to be ignored
+      setTimeout(() => {
+        isTouchActiveRef.current = false;
+      }, 100);
     };
 
     // Clear pattern
@@ -352,7 +376,7 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
               'touch-none rounded-lg',
               !disabled && mode === 'input' && 'cursor-pointer',
               disabled && 'opacity-50',
-              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background'
             )}
             style={{ backgroundColor: 'var(--color-surface)' }}
           >
@@ -463,7 +487,7 @@ export const PatternLock = React.forwardRef<HTMLDivElement, PatternLockProps>(
               <button
                 type="button"
                 onClick={clearPattern}
-                className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary"
+                className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded-sm"
               >
                 Clear
               </button>

@@ -5,6 +5,7 @@
  */
 
 import { db } from '@/lib/db';
+import { ALL_ROLES, type UserRole } from '@/types/roles';
 
 // =============================================================================
 // Types
@@ -396,6 +397,25 @@ export function validateBirthYear(year: number): ValidationResult {
   // User probably shouldn't be over 120
   if (age > 120) {
     return { valid: false, error: 'Please check your birth year' };
+  }
+
+  return { valid: true };
+}
+
+// =============================================================================
+// Role Validation
+// =============================================================================
+
+/**
+ * Validate user role selection
+ */
+export function validateRole(role: string | undefined): { valid: boolean; error?: string } {
+  if (!role) {
+    return { valid: false, error: 'Please select a role' };
+  }
+
+  if (!ALL_ROLES.includes(role as UserRole)) {
+    return { valid: false, error: 'Invalid role selected' };
   }
 
   return { valid: true };

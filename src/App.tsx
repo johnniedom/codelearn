@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
+import type { UserRole } from '@/types/roles';
+
 import { TopBar } from '@/components/navigation/TopBar';
 import { BottomNav, useShowBottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -29,6 +31,17 @@ const ExercisePage = lazy(() => import('@/pages/ExercisePage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+
+// CMS Pages (Phase 2)
+const CMSLayout = lazy(() => import('@/components/cms/CMSLayout'));
+const CMSDashboard = lazy(() => import('@/pages/cms/CMSDashboard'));
+const ContentBrowser = lazy(() => import('@/pages/cms/ContentBrowser'));
+const LessonEditor = lazy(() => import('@/pages/cms/LessonEditor'));
+const QuizEditor = lazy(() => import('@/pages/cms/QuizEditor'));
+const ExerciseEditor = lazy(() => import('@/pages/cms/ExerciseEditor'));
+const AssetManager = lazy(() => import('@/pages/cms/AssetManager'));
+const DraftList = lazy(() => import('@/pages/cms/DraftList'));
+const AuthorSettings = lazy(() => import('@/pages/cms/AuthorSettings'));
 
 /**
  * Page Loading Fallback
@@ -79,6 +92,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * Role Protected Route Wrapper
+ *
+ * Restricts access based on user role.
+ * Must be used inside a ProtectedRoute to ensure authentication.
+ */
+function RoleProtectedRoute({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles: UserRole[];
+}) {
+  const { profile } = useAuthStore();
+
+  if (!profile || !allowedRoles.includes(profile.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+/**
  * Public Route Wrapper
  *
  * Redirects to home if already authenticated (for login/register pages).
@@ -117,19 +152,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const isWorkbenchPage = location.pathname.startsWith('/exercises/');
   const shouldShowBottomNav = showBottomNav && isAuthenticated && !isLocked && !isAuthPage && !isWorkbenchPage;
 
-  // Full-width layout for workbench pages
-  const isFullWidthPage = isWorkbenchPage;
+  // Full-width layout for workbench and CMS pages
+  const isCMSPage = location.pathname.startsWith('/cms');
+  const isFullWidthPage = isWorkbenchPage || isCMSPage;
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-text">
-      {/* Skip link for keyboard navigation */}
-      <a
-        href="#main-content"
-        className="skip-link"
-      >
-        Skip to main content
-      </a>
-
       {/* Top navigation with offline indicator */}
       <TopBar />
 
@@ -301,6 +329,27 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
+              {/* CMS routes (Author role required) */}
+              <Route
+                path="/cms"
+                element={
+                  <ProtectedRoute>
+                    <RoleProtectedRoute allowedRoles={['author', 'teacher']}>
+                      <CMSLayout />
+                    </RoleProtectedRoute>
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<CMSDashboard />} />
+                <Route path="content" element={<ContentBrowser />} />
+                <Route path="lessons/:id?" element={<LessonEditor />} />
+                <Route path="quizzes/:id?" element={<QuizEditor />} />
+                <Route path="exercises/:id?" element={<ExerciseEditor />} />
+                <Route path="assets" element={<AssetManager />} />
+                <Route path="drafts" element={<DraftList />} />
+                <Route path="settings" element={<AuthorSettings />} />
+              </Route>
 
               {/* Legacy route redirects */}
               <Route

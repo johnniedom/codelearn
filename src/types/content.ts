@@ -112,6 +112,8 @@ export interface Author {
   email?: string;
   organization?: string;
   url?: string;
+  avatar?: string;  // path to avatar image
+  bio?: string;     // author bio
 }
 
 /** Learning objective with Bloom's taxonomy classification */

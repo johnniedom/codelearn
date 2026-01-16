@@ -42,7 +42,7 @@ function CourseCard({ course, progress, onClick }: CourseCardProps) {
         'rounded-lg border border-border bg-surface',
         'transition-all duration-fast',
         'hover:border-border-focus hover:shadow-md',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         'active:scale-[0.99]'
       )}
     >

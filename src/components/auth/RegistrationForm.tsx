@@ -5,10 +5,11 @@
  *
  * Steps:
  * 1. Personal Info (name, grade, birth year)
- * 2. Profile Setup (icon, color)
- * 3. Security Image
- * 4. PIN Setup
- * 5. Pattern Lock MFA
+ * 2. Role Selection (student, teacher, author)
+ * 3. Profile Setup (icon, color)
+ * 4. Security Image
+ * 5. PIN Setup
+ * 6. Pattern Lock MFA
  */
 
 import * as React from 'react';
@@ -20,6 +21,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { PINInput } from './PINInput';
 import { SecurityImagePicker } from './SecurityImagePicker';
 import { PatternLock } from './PatternLock';
+import { RoleSelector } from './RoleSelector';
+import type { UserRole } from '@/types/roles';
 import {
   validateFullName,
   validatePreferredName,
@@ -44,6 +47,7 @@ export interface RegistrationData {
   preferredName: string;
   gradeLevel: GradeLevel;
   birthYear: number;
+  role: UserRole;
   profileIcon: string;
   profileColor: string;
   securityImageId: string;
@@ -64,6 +68,7 @@ interface RegistrationFormProps {
 
 type RegistrationStep =
   | 'personal-info'
+  | 'role-selection'
   | 'profile-setup'
   | 'security-image'
   | 'pin-setup'
@@ -71,6 +76,7 @@ type RegistrationStep =
 
 const STEPS: RegistrationStep[] = [
   'personal-info',
+  'role-selection',
   'profile-setup',
   'security-image',
   'pin-setup',
@@ -79,6 +85,7 @@ const STEPS: RegistrationStep[] = [
 
 const STEP_TITLES: Record<RegistrationStep, string> = {
   'personal-info': 'About You',
+  'role-selection': 'Choose Your Role',
   'profile-setup': 'Your Profile',
   'security-image': 'Security Image',
   'pin-setup': 'Create PIN',
@@ -87,6 +94,7 @@ const STEP_TITLES: Record<RegistrationStep, string> = {
 
 const STEP_DESCRIPTIONS: Record<RegistrationStep, string> = {
   'personal-info': 'Tell us a bit about yourself',
+  'role-selection': 'Select how you will use CodeLearn',
   'profile-setup': 'Choose how your profile looks',
   'security-image': 'Pick an image to recognize your login',
   'pin-setup': 'Create a 6-digit PIN to protect your account',
@@ -112,6 +120,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   const [preferredName, setPreferredName] = React.useState('');
   const [gradeLevel, setGradeLevel] = React.useState<GradeLevel | ''>('');
   const [birthYear, setBirthYear] = React.useState('');
+  const [role, setRole] = React.useState<UserRole>('student');
   const [profileIcon, setProfileIcon] = React.useState('');
   const [profileColor, setProfileColor] = React.useState('');
   const [securityImageId, setSecurityImageId] = React.useState('');
@@ -144,6 +153,11 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
         } else {
           newErrors.birthYear = 'Please enter your birth year';
         }
+        break;
+      }
+
+      case 'role-selection': {
+        // Role always has a default value, no validation needed
         break;
       }
 
@@ -227,6 +241,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       preferredName: preferredName.trim(),
       gradeLevel: gradeLevel as GradeLevel,
       birthYear: parseInt(birthYear, 10),
+      role,
       profileIcon,
       profileColor,
       securityImageId,
@@ -242,6 +257,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
     switch (currentStep) {
       case 'personal-info':
         return !!(fullName && preferredName && gradeLevel && birthYear);
+      case 'role-selection':
+        return !!role;
       case 'profile-setup':
         return !!(profileIcon && profileColor);
       case 'security-image':
@@ -344,7 +361,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                   id="gradeLevel"
                   value={gradeLevel}
                   onChange={(e) => setGradeLevel(e.target.value as GradeLevel)}
-                  className="flex h-11 w-full rounded-md border border-border bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                  className="flex h-11 w-full rounded-md border border-border bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-invalid={!!errors.gradeLevel}
                   aria-describedby={errors.gradeLevel ? 'gradeLevel-error' : undefined}
                 >
@@ -384,7 +401,29 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             </div>
           )}
 
-          {/* Step 2: Profile Setup */}
+          {/* Step 2: Role Selection */}
+          {currentStep === 'role-selection' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold">Choose Your Role</h2>
+                <p className="text-text-muted mt-2">Select how you'll use CodeLearn</p>
+              </div>
+              <RoleSelector
+                selectedRole={role}
+                onSelectRole={(selectedRole) => setRole(selectedRole)}
+              />
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={handleBack} className="flex-1">
+                  Back
+                </Button>
+                <Button onClick={handleNext} className="flex-1">
+                  Continue
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Profile Setup */}
           {currentStep === 'profile-setup' && (
             <div className="space-y-6">
               {/* Preview */}
@@ -468,7 +507,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             </div>
           )}
 
-          {/* Step 3: Security Image */}
+          {/* Step 4: Security Image */}
           {currentStep === 'security-image' && (
             <SecurityImagePicker
               value={securityImageId}
@@ -478,7 +517,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             />
           )}
 
-          {/* Step 4: PIN Setup */}
+          {/* Step 5: PIN Setup */}
           {currentStep === 'pin-setup' && (
             <div className="space-y-6">
               <div>
@@ -512,7 +551,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
             </div>
           )}
 
-          {/* Step 5: Pattern Setup */}
+          {/* Step 6: Pattern Setup */}
           {currentStep === 'pattern-setup' && (
             <div className="space-y-4">
               {!isConfirmingPattern ? (
@@ -521,6 +560,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     Draw a pattern by connecting at least 4 dots
                   </p>
                   <PatternLock
+                    key="initial"
                     onChange={setPattern}
                     onComplete={() => {}}
                     error={!!errors.pattern}
@@ -534,6 +574,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     Draw the same pattern again to confirm
                   </p>
                   <PatternLock
+                    key="confirm"
                     onChange={setConfirmPattern}
                     onComplete={() => {}}
                     error={!!errors.confirmPattern}

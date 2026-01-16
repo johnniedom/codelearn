@@ -101,7 +101,7 @@ export const SecurityImagePicker = React.forwardRef<
                   'relative flex flex-col items-center justify-center',
                   'h-16 w-full rounded-lg border-2 p-2',
                   'transition-all duration-150',
-                  'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                  'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
                   // Normal state
                   !isSelected && !error && 'border-border bg-surface hover:border-primary/50',
                   // Selected state

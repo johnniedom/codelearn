@@ -25,6 +25,8 @@ import {
   Check,
   AlertTriangle,
   Smartphone,
+  LogOut,
+  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +34,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { useSyncStore } from '@/stores/syncStore';
+import { useAuthStore } from '@/stores/authStore';
 import { getDeviceState, updateStorageQuota } from '@/lib/db';
 import useOnlineStatus from '@/hooks/useOnlineStatus';
 
@@ -65,6 +68,7 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
   const { hubUrl, setHubUrl, isHubReachable, discoverHub, lastSyncAt } = useSyncStore();
+  const { logout } = useAuthStore();
 
   const [deviceId, setDeviceId] = useState('');
   const [hubInput, setHubInput] = useState(hubUrl || '');
@@ -136,6 +140,20 @@ export function SettingsPage() {
     }
   }, []);
 
+  // Logout handler
+  const handleLogout = useCallback(async () => {
+    if (!confirm('Are you sure you want to logout?')) {
+      return;
+    }
+
+    try {
+      await logout();
+      navigate('/profiles', { replace: true });
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  }, [logout, navigate]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -154,6 +172,45 @@ export function SettingsPage() {
       </header>
 
       <main className="space-y-6 p-4">
+        {/* Account */}
+        <section
+          className="rounded-xl border border-border bg-surface p-4"
+          aria-labelledby="account-heading"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+              <Users className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div className="flex-1">
+              <h2 id="account-heading" className="font-semibold text-text">
+                Account
+              </h2>
+              <p className="text-sm text-text-muted">
+                Manage your profile
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex gap-3">
+            <Button
+              variant="outline"
+              className="flex-1 gap-2"
+              onClick={() => navigate('/profiles')}
+            >
+              <Users className="h-4 w-4" />
+              Switch Profile
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1 gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
+        </section>
+
         {/* Hub Connection */}
         <section
           className="rounded-xl border border-border bg-surface p-4"

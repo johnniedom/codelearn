@@ -83,7 +83,7 @@ export const ProfileCard = React.forwardRef<HTMLButtonElement, ProfileCardProps>
           // Base styles
           'relative flex w-full flex-col items-center gap-2 rounded-xl p-4',
           'border-2 transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
           // Normal state
           !selected && 'border-border bg-surface hover:border-primary/50 hover:shadow-md',
           // Selected state
@@ -183,7 +183,7 @@ export const AddProfileCard = React.forwardRef<
         'flex w-full flex-col items-center justify-center gap-2 rounded-xl p-4',
         'border-2 border-dashed border-border',
         'transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
         // Hover state
         !disabled && 'hover:border-primary hover:bg-primary/5',
         // Disabled state
