@@ -266,7 +266,7 @@ export default function LessonEditor() {
 
           // Navigate to the new draft URL
           navigate(`/cms/lessons/${newDraft.id}`, { replace: true });
-        } else {
+        } else if (id) {
           // Load existing draft
           const existingDraft = await getDraft(id);
           if (!existingDraft) {

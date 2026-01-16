@@ -153,9 +153,25 @@ interface DraftListItemProps {
   draft: ContentDraft;
 }
 
+/**
+ * Get the editor route for a draft based on its content type
+ */
+const getEditorRoute = (draft: ContentDraft): string => {
+  switch (draft.contentType) {
+    case 'lesson':
+      return `/cms/lessons/${draft.id}`;
+    case 'quiz':
+      return `/cms/quizzes/${draft.id}`;
+    case 'exercise':
+      return `/cms/exercises/${draft.id}`;
+    default:
+      return `/cms/content`;
+  }
+};
+
 const DraftListItem = ({ draft }: DraftListItemProps) => (
   <Link
-    to={`/cms/drafts/${draft.id}`}
+    to={getEditorRoute(draft)}
     className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg hover:bg-surface-secondary transition-colors group gap-2 sm:gap-3 min-h-[56px]"
     aria-label={`Edit ${draft.title || 'Untitled'} - ${getContentTypeLabel(draft.contentType)}, status: ${draft.status}`}
   >

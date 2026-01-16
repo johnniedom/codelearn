@@ -12,7 +12,7 @@
  * - Custom CodeLearn theme
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { EditorState, type Extension } from '@codemirror/state';
 import {
   EditorView,
@@ -195,7 +195,7 @@ export function CodeEditor({
   initialCode,
   language,
   onChange,
-  readOnlyRegions = [],
+  readOnlyRegions,
   readOnly = false,
   darkTheme = false,
   className,
@@ -209,6 +209,12 @@ export function CodeEditor({
   // Store onChange in ref to avoid recreating editor
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+
+  // Memoize readOnlyRegions to prevent editor recreation on every render
+  const stableReadOnlyRegions = useMemo(
+    () => readOnlyRegions ?? [],
+    [readOnlyRegions]
+  );
 
   /**
    * Create the editor view
@@ -299,11 +305,11 @@ export function CodeEditor({
     editorViewRef.current = view;
 
     // Apply read-only regions if any
-    if (readOnlyRegions.length > 0 && !readOnly) {
-      applyReadOnlyRegions(view, readOnlyRegions);
+    if (stableReadOnlyRegions.length > 0 && !readOnly) {
+      applyReadOnlyRegions(view, stableReadOnlyRegions);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- initialCode intentionally excluded to prevent recreation on every keystroke
-  }, [language, readOnly, darkTheme, minHeight, maxHeight, readOnlyRegions]);
+  }, [language, readOnly, darkTheme, minHeight, maxHeight, stableReadOnlyRegions]);
 
   /**
    * Apply read-only regions to the editor

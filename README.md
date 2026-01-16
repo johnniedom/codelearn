@@ -4,6 +4,12 @@ An offline-first Progressive Web App (PWA) for coding education, designed for un
 
 ![CodeLearn](https://img.shields.io/badge/Status-MVP-blue) ![PWA](https://img.shields.io/badge/PWA-Ready-green) ![Offline](https://img.shields.io/badge/Offline-First-orange)
 
+![CodeLearn Screenshot](public/image.png)
+
+| Web IDE | CMS |
+|---------|-----|
+| ![Web IDE](public/wed_Ide.png) | ![CMS](public/cms.png) |
+
 ## Features
 
 ### Core Features
