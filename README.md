@@ -14,6 +14,8 @@ An offline-first Progressive Web App (PWA) for coding education, designed for un
 - **Code Workbench**: Python (Pyodide) and JavaScript execution in-browser
 - **Quizzes**: Multiple choice and fill-in-the-blank assessments
 - **Progress Tracking**: Persistent progress stored locally in IndexedDB
+- **Content Management System (CMS)**: Author lessons, quizzes, and exercises with a built-in editor
+- **Publishing**: Export content as ZIP or publish directly to Hub
 
 ### Technical Highlights
 - PWA with Service Worker caching (works offline)
@@ -47,7 +49,7 @@ An offline-first Progressive Web App (PWA) for coding education, designed for un
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/codelearn.git
+git clone https://github.com/johnniedom/codelearn.git
 cd codelearn
 
 # Install dependencies
@@ -75,6 +77,8 @@ pnpm preview
 src/
 ├── components/          # React components
 │   ├── auth/           # PIN, Pattern Lock, Registration
+│   ├── cms/            # Content authoring & publishing
+│   │   └── editors/    # Markdown, Quiz, Exercise editors
 │   ├── common/         # ErrorBoundary, LoadingSkeleton
 │   ├── content/        # Lessons, Courses, Progress
 │   ├── quiz/           # MCQ, Fill-blank questions
