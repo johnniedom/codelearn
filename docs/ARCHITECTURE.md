@@ -13,46 +13,7 @@ CodeLearn is an **offline-first Progressive Web App (PWA)** for coding education
 
 ## System Architecture Overview
 
-```
-+---------------------------------------------------------------------+
-|                         CodeLearn PWA                                |
-|                    (Offline-First Architecture)                      |
-+---------------------------------------------------------------------+
-|                                                                      |
-|  +-----------+  +-----------+  +-----------+  +----------+          |
-|  |  React 19 |  |  Zustand  |  |   Dexie   |  | Service  |          |
-|  |  + Router |  |   Stores  |  | IndexedDB |  |  Worker  |          |
-|  +-----+-----+  +-----+-----+  +-----+-----+  +-----+----+          |
-|        |              |              |              |                |
-|        +==============+==============+==============+                |
-|                       |              |                               |
-|  +--------------------+--------------+-----------------------------+ |
-|  |                    Application Layer                            | |
-|  |  +--------+  +--------+  +--------+  +------------+            | |
-|  |  |  Auth  |  |Content |  |  Code  |  |    Sync    |            | |
-|  |  |Service |  | Loader |  |Executor|  |   Service  |            | |
-|  |  +--------+  +--------+  +--------+  +------------+            | |
-|  +-----------------------------------------------------------------+ |
-|                                                                      |
-|  +-----------------------------------------------------------------+ |
-|  |                    Execution Layer                              | |
-|  |  +------------------+    +------------------------------+       | |
-|  |  |  Pyodide WASM    |    |  JS Sandbox (eval + timeout) |       | |
-|  |  | (Python runtime) |    |                              |       | |
-|  |  +------------------+    +------------------------------+       | |
-|  +-----------------------------------------------------------------+ |
-|                                                                      |
-+---------------------------------------------------------------------+
-                                   |
-                                   | Sync (when online)
-                                   v
-                    +-----------------------------+
-                    |     Raspberry Pi Hub        |
-                    |  (Phase 6 - Not in MVP)     |
-                    |  - SQLite + REST API        |
-                    |  - mDNS discovery           |
-                    +-----------------------------+
-```
+![System Architecture Overview](../public/SystemArchOverview.png)
 
 ---
 
@@ -153,24 +114,7 @@ src/
 
 ## 4. State Management (Zustand)
 
-```
-+------------------------------------------------------------------+
-|                        Zustand Stores                             |
-+-----------------+-----------------+------------------------------+
-|   authStore     |    uiStore      |        syncStore             |
-|   (persisted)   |    (partial)    |        (partial)             |
-+-----------------+-----------------+------------------------------+
-| - currentUser   | - theme         | - isOnline                   |
-| - session       | - modals        | - hubUrl                     |
-| - isLocked      | - toasts        | - syncStatus                 |
-| - credentials   | - loading       | - pendingItemsCount          |
-| - role          | - sidebar       | - lastSyncAt                 |
-+-----------------+-----------------+------------------------------+
-        |                              |
-        v                              v
-   localStorage                   localStorage
-   (encrypted)                    (hubUrl only)
-```
+![State Management](../public/Statemanagement.png)
 
 ### Session Security Rules
 
@@ -187,22 +131,7 @@ src/
 
 **Database:** `CodeLearnDB` (Version 4)
 
-```
-+-----------------------------------------------------------------+
-|                        IndexedDB Tables                          |
-+------------------+------------------+---------------------------+
-|    Identity      |      Learning    |          System           |
-+------------------+------------------+---------------------------+
-| - profiles       | - progress       | - syncQueue               |
-| - credentials    | - quizAttempts   | - notifications           |
-| - sessions       | - contentIndex   | - deviceState             |
-| - mfaData        |                  | - auditLogs               |
-+------------------+------------------+---------------------------+
-|                          CMS Tables                              |
-+-----------------------------------------------------------------+
-| - authorProfiles  - authorActivity  - contentDrafts  - localAssets |
-+-----------------------------------------------------------------+
-```
+![Data Layer](../public/DataLayer.png)
 
 ### Data Integrity Features
 
@@ -215,32 +144,7 @@ src/
 
 ## 6. PWA & Offline Architecture
 
-```
-+-----------------------------------------------------------------+
-|                     Service Worker Strategy                      |
-+-----------------------------------------------------------------+
-|                                                                  |
-|  PRECACHE (build time):                                         |
-|  - All JS/CSS bundles                                           |
-|  - HTML shell                                                   |
-|  - Fonts, icons                                                 |
-|  - Pyodide WASM (~10MB, after first load)                       |
-|                                                                  |
-|  RUNTIME CACHE:                                                 |
-|  - Google Fonts -> CacheFirst (1 year)                          |
-|  - API responses -> NetworkFirst (when hub available)           |
-|                                                                  |
-+-----------------------------------------------------------------+
-|                    Offline Capabilities                          |
-+-----------------------------------------------------------------+
-|  [x] All user data persisted in IndexedDB                       |
-|  [x] All static assets cached                                   |
-|  [x] Python execution via Pyodide (cached WASM)                 |
-|  [x] JavaScript execution (built-in)                            |
-|  [x] Content packages stored locally                            |
-|  [x] Target: 30+ days offline operation                         |
-+-----------------------------------------------------------------+
-```
+![PWA Architecture](../public/PWA_Architecture.png)
 
 ---
 
@@ -279,46 +183,7 @@ Routes
 
 ## 8. Code Execution Architecture
 
-```
-+-----------------------------------------------------------------+
-|                    Code Execution Pipeline                       |
-+-----------------------------------------------------------------+
-|                                                                  |
-|  User Code                                                       |
-|      |                                                          |
-|      v                                                          |
-|  +---------------+                                              |
-|  | CodeMirror 6  |  <- Syntax highlighting, autocomplete        |
-|  |   (Editor)    |                                              |
-|  +-------+-------+                                              |
-|          |                                                      |
-|          v                                                      |
-|  +---------------------------------------------+                |
-|  |           Language Router                    |                |
-|  +----------------+----------------------------+                |
-|  |    Python      |       JavaScript           |                |
-|  |       |        |            |               |                |
-|  |       v        |            v               |                |
-|  |  +---------+   |    +--------------+       |                |
-|  |  | Pyodide |   |    | eval() with  |       |                |
-|  |  |  WASM   |   |    | timeout wrap |       |                |
-|  |  +---------+   |    +--------------+       |                |
-|  +--------+-------+------------+---------------+                |
-|           |                    |                                 |
-|           +----------+---------+                                |
-|                      v                                           |
-|             +---------------+                                   |
-|             |  Test Runner  |  <- Compare output vs expected    |
-|             |  (visible +   |                                   |
-|             |  hidden tests)|                                   |
-|             +-------+-------+                                   |
-|                     v                                            |
-|             +---------------+                                   |
-|             | OutputPanel   |  <- Results display               |
-|             +---------------+                                   |
-|                                                                  |
-+-----------------------------------------------------------------+
-```
+![Code Execution](../public/CodeExecution.png)
 
 ### Execution Constraints
 
@@ -333,37 +198,7 @@ Routes
 
 ## 9. Sync Architecture
 
-```
-+-----------------------------------------------------------------+
-|                     Sync Flow Diagram                            |
-+-----------------------------------------------------------------+
-|                                                                  |
-|   PWA (Client)                         Hub (Server)              |
-|   +--------------+                    +--------------+          |
-|   |              |  1. Check Online   |              |          |
-|   |  syncStore   | -----------------> |  /api/health |          |
-|   |              |                    |              |          |
-|   |              |  2. Get Changes    |              |          |
-|   |  syncQueue   | <----------------- |  SQLite DB   |          |
-|   |              |    (since HLC)     |              |          |
-|   |              |                    |              |          |
-|   |              |  3. Push Changes   |              |          |
-|   |  IndexedDB   | -----------------> |              |          |
-|   |              |    (delta sync)    |              |          |
-|   +--------------+                    +--------------+          |
-|                                                                  |
-+-----------------------------------------------------------------+
-|                    Conflict Resolution                           |
-+-----------------------------------------------------------------+
-|  Strategy: Last-Write-Wins (LWW) using Hybrid Logical Clock     |
-|                                                                  |
-|  HLC = { wallTime: number, counter: number, nodeId: string }    |
-|                                                                  |
-|  Compare: If wallTime equal -> use counter -> use nodeId        |
-|                                                                  |
-|  Result: Deterministic winner regardless of arrival order       |
-+-----------------------------------------------------------------+
-```
+![Sync Architecture](../public/SyncArchitecture.png)
 
 ### Sync Constraints
 
@@ -378,41 +213,7 @@ Routes
 
 ## 10. Security Architecture
 
-```
-+-----------------------------------------------------------------+
-|                    Authentication Flow                           |
-+-----------------------------------------------------------------+
-|                                                                  |
-|  Registration                                                    |
-|  +-------------+    +-------------+    +-------------+          |
-|  |   Profile   | -> |   6-digit   | -> |   Pattern   |          |
-|  |   (name,    |    |     PIN     |    |    Lock     |          |
-|  |   avatar)   |    |             |    |   (MFA)     |          |
-|  +-------------+    +------+------+    +------+------+          |
-|                            |                  |                  |
-|                            v                  v                  |
-|                    +------------------------------+              |
-|                    |   Argon2id Hash + Salt      |              |
-|                    |   (stored in credentials)    |              |
-|                    +------------------------------+              |
-|                                                                  |
-+-----------------------------------------------------------------+
-|                    Login Flow                                    |
-+-----------------------------------------------------------------+
-|                                                                  |
-|  +-------------+    +-------------+    +-------------+          |
-|  |   Select    | -> |   Enter     | -> |   Draw      |          |
-|  |   Profile   |    |    PIN      |    |   Pattern   |          |
-|  +-------------+    +-------------+    +-------------+          |
-|                                                |                  |
-|                                                v                  |
-|                                        +-------------+           |
-|                                        |   Session   |           |
-|                                        |   Created   |           |
-|                                        +-------------+           |
-|                                                                  |
-+-----------------------------------------------------------------+
-```
+![Security Architecture](../public/SecurityArch.png)
 
 ### Security Features
 
@@ -484,22 +285,7 @@ Routes
 
 ---
 
-## 13. Current Limitations (Known Bugs)
-
-| Feature | Status | Impact |
-|---------|--------|--------|
-| Hub Sync | Simulated | Progress local only |
-| Background Sync | Not wired | Manual sync only |
-| Push Notifications | Not implemented | No server push |
-| Video Content | Schema only | No video player |
-| Quiz Types | 2 of 10 | MCQ + Fill-blank only |
-| mDNS Discovery | Planned Phase 6 | Manual hub URL |
-
-See `KNOWN_BUGS.md` for full details.
-
----
-
-## 14. Deployment Architecture (MVP)
+## 13. Deployment Architecture (MVP)
 
 ```
 +-----------------------------------------------------------------+
@@ -510,15 +296,12 @@ See `KNOWN_BUGS.md` for full details.
 |   Output: dist/ (static files)                                   |
 |                                                                  |
 |   Deployment Options:                                            |
-|   - Vercel (recommended for demo)                               |
-|   - Netlify                                                      |
-|   - GitHub Pages                                                 |
-|   - Any static file host                                         |
+|   - Vercel                                                       |
 |                                                                  |
-|   Future (Phase 6-7):                                            |
-|   - Raspberry Pi Hub with SQLite                                |
-|   - mDNS for local discovery                                    |
-|   - REST API for sync                                           |
+|   Future plans:                                                  |
+|   - Raspberry Pi Hub with SQLite                                 |
+|   - mDNS for local discovery                                     |
+|   - REST API for sync                                            |
 |                                                                  |
 +-----------------------------------------------------------------+
 ```
@@ -547,32 +330,12 @@ pnpm lint
 ## Conclusion
 
 CodeLearn is a **production-ready offline-first PWA** with:
-
-- [x] Complete multi-factor authentication (PIN + Pattern Lock)
-- [x] Robust local data persistence with integrity verification
-- [x] Full PWA support with 30+ days offline capability
-- [x] In-browser code execution (Python via Pyodide, JavaScript)
-- [x] Comprehensive content type system with 15 Python lessons
-- [x] Role-based CMS for content authoring
-- [x] Sync infrastructure ready for hub integration
-
-The architecture follows modern React patterns with proper separation of concerns and is ready for MVP submission.
-
----
-
-## Future Roadmap
-
-### Phase 6: Hub Server
-- Raspberry Pi deployment with SQLite
-- REST API endpoints
-- mDNS discovery (`codelearn.local`)
-
-### Phase 7: Enhanced Features
-- Background sync
-- Push notifications
-- Video content player
-- Additional quiz types
-
----
+- ✓ Complete multi-factor authentication (PIN + Pattern Lock)
+- ✓ Robust local data persistence with integrity verification
+- ✓ Full PWA support with 30+ days offline capability
+- ✓ In-browser code execution (Python via Pyodide, JavaScript)
+- ✓ Comprehensive content type system with 15 Python lessons
+- ✓ Role-based CMS for content authoring
+- ✓ Sync infrastructure ready for hub integration
 
 *Document generated from codebase analysis. See individual spec files in `specs/` directory for detailed requirements.*
