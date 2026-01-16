@@ -45,6 +45,18 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,wasm}'],
+        globIgnores: [
+          '**/SystemArchOverview.png',
+          '**/SyncArchitecture.png',
+          '**/Statemanagement.png',
+          '**/SecurityArch.png',
+          '**/PWA_Architecture.png',
+          '**/DataLayer.png',
+          '**/CodeExecution.png',
+          '**/image.png',
+          '**/cms.png',
+          '**/wed_Ide.png'
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
