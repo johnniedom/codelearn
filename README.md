@@ -112,14 +112,26 @@ The app includes sample content for testing:
 - **5 Quizzes**: Testing fundamentals, control flow, and loops
 - **Code Exercises**: Python and JavaScript challenges
 
+## On-Premise Deployment
+
+CodeLearn is designed for **on-premise classroom deployment** using a local server:
+
+- **Hub Server**: Raspberry Pi 4/5 (~$35) or any school PC running Node.js
+- **Local WiFi**: Basic router creates classroom network — no internet required
+- **Auto-Install**: Students visit Hub URL → PWA installs automatically with all content
+- **Offline Learning**: Students continue at home with 30+ days offline capability
+- **Auto-Sync**: Progress syncs via delta-based protocol (HLC timestamps, LWW conflict resolution) when students reconnect to classroom WiFi
+- **Content Loading**: Via internet, USB drive, or SD card
+
+See [Architecture Document](docs/ARCHITECTURE.md) for detailed deployment diagrams and specifications.
+
 ## Known Limitations
 
 ### Current MVP Limitations
-1. **Hub Sync**: Client-side sync logic complete, hub server simulated
+1. **Hub Server**: Client-side sync logic complete; hub server deployment uses simulated responses for demo
 2. **Background Sync**: Service Worker sync not fully wired
-3. **Push Notifications**: Not implemented
-4. **Video Content**: Schema defined, player not implemented
-5. **Advanced Quiz Types**: Only MCQ and fill-blank (6 other types planned)
+3. **Video Content**: Schema defined, player not implemented
+4. **Advanced Quiz Types**: Only MCQ and fill-blank (6 other types planned)
 
 ### Browser Support
 - Chrome/Edge 90+
