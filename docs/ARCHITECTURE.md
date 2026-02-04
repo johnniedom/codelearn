@@ -285,26 +285,59 @@ Routes
 
 ---
 
-## 13. Deployment Architecture (MVP)
+## 13. On-Premise Deployment Model
 
-```
-+-----------------------------------------------------------------+
-|                    MVP Deployment                                |
-+-----------------------------------------------------------------+
-|                                                                  |
-|   Build: pnpm build                                              |
-|   Output: dist/ (static files)                                   |
-|                                                                  |
-|   Deployment Options:                                            |
-|   - Vercel                                                       |
-|                                                                  |
-|   Future plans:                                                  |
-|   - Raspberry Pi Hub with SQLite                                 |
-|   - mDNS for local discovery                                     |
-|   - REST API for sync                                            |
-|                                                                  |
-+-----------------------------------------------------------------+
-```
+![On-Premise Deployment Model](../public/DeploymentModel.png)
+
+### Overview
+
+CodeLearn is designed for **on-premise deployment in classrooms** where internet connectivity is limited or unavailable. The deployment model uses a local server (Raspberry Pi or school PC) as a classroom hub, creating a self-contained learning environment.
+
+### Deployment Layers
+
+#### Layer 1: Cloud / Internet (Optional)
+- **Content Repository** — centralized course packages and updates
+- **CodeLearn Hub Cloud** — optional centralized content sync
+- **USB / SD Card** — alternative offline content loading when no internet is available
+- **Internet is NOT required** — content can be loaded entirely via USB or SD card
+
+#### Layer 2: Local Hub (Classroom Server)
+- **Hardware:** Raspberry Pi 4/5 (2GB+ RAM, ~$35) or any school PC with Node.js 18+
+- **Hub Server** — serves the CodeLearn PWA to devices over local WiFi
+- **Sync API** — accepts sync deltas from student devices via `POST /api/sync`
+- **Content Store** — master copy of all course content
+- **Analytics DB** — stores aggregated student progress for teacher dashboards
+- **WiFi Access Point** — basic router creates a local classroom network (no internet required)
+
+#### Layer 3: Student Devices (In Classroom)
+- **Any device with a modern browser** — phones, tablets, laptops
+- **PWA auto-installs** on first visit to the Hub URL
+- **All content cached locally** via Service Worker + IndexedDB
+- **Multi-user support** — shared devices use profile switching with PIN + Pattern Lock MFA
+- **Code execution** — Python (Pyodide WASM) and JavaScript run entirely in-browser
+
+#### Layer 4: Offline at Home (No Internet)
+- **Students continue learning** at home with all lessons, quizzes, and code editor working offline
+- **Progress saved locally** in IndexedDB (persists 30+ days)
+- **Auto-sync on reconnect** — when students return to class and join Hub WiFi, progress deltas sync automatically
+
+### Sync Flow (Delta-Based)
+
+1. **Connect** — Student device joins classroom WiFi
+2. **Install** — PWA auto-installs from Hub (first visit only)
+3. **Learn** — All content works offline after first sync
+4. **Sync** — Progress deltas sent to Hub with HLC timestamps
+5. **Resolve** — Conflicts handled via Last-Write-Wins (CRDT)
+6. **Offline** — Students continue learning at home, no internet needed
+
+### Deployment Specifications
+
+| Category | Details |
+|----------|---------|
+| **Hub Hardware** | Raspberry Pi 4/5 (2GB+ RAM) or any PC with Node.js 18+, ~16GB storage, WiFi router |
+| **Student Devices** | Any device with a browser (Android/iOS/Chrome/Firefox), ~100MB storage per user, 4GB+ RAM for Python |
+| **Security** | AES-256-GCM encryption, Argon2id hashing, PIN + Pattern Lock MFA, multi-user isolation |
+| **Sync Protocol** | Hybrid Logical Clock (HLC), delta-based (only changes sent), CRDT conflict resolution (LWW), SHA-256 integrity |
 
 ### Build Commands
 
