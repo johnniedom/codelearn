@@ -4,9 +4,6 @@ This document lists known issues and limitations in the CodeLearn MVP.
 
 ## Critical Issues
 
-### None Currently
-All critical issues have been resolved.
-
 ---
 
 ## Known Limitations
@@ -32,19 +29,8 @@ All critical issues have been resolved.
 ### 4. Video Content
 - **Status**: Schema only
 - **Description**: `VideoContent` type is defined but no video player component exists.
-- **Impact**: Video lessons cannot be played.
-- **Workaround**: Use text-based lessons with code examples.
-
-### 5. Advanced Quiz Types
-- **Status**: Partially implemented
-- **Description**: Only `multiple-choice` and `fill-blank` questions work. These types are defined but not rendered:
-  - TrueFalse
-  - Matching
-  - Ordering
-  - CodeOutput
-  - CodeCompletion
-- **Impact**: Limited question variety.
-- **Workaround**: Use MCQ and fill-blank for assessments.
+- **Impact**: Video lessons cannot be played, no video will be renderd in MVP
+- **Workaround**: Use text-based lessons with code example and Exercise to access the user understanding. 
 
 ---
 
@@ -60,11 +46,6 @@ All critical issues have been resolved.
 - **Impact**: Slightly slower initial load for exercise pages.
 - **Mitigation**: Code-splitting already applied; consider lazy-loading CodeMirror extensions.
 
-### 3. Read-Only Code Regions
-- **Issue**: Read-only regions in exercises are highlighted but not enforced.
-- **Impact**: Users can accidentally modify starter code templates.
-- **Workaround**: Reset button available to restore original code.
-
 ---
 
 ## Browser Compatibility
@@ -73,7 +54,6 @@ All critical issues have been resolved.
 - ✅ Chrome 90+
 - ✅ Edge 90+
 - ✅ Firefox 90+
-- ✅ Safari 15+
 
 ### Known Issues
 - **Safari Private Browsing**: IndexedDB may be limited; some features may not persist.
@@ -91,7 +71,7 @@ All critical issues have been resolved.
 ### Low-Memory Devices
 - Pyodide loader checks for memory pressure
 - Warning shown if device has <2GB available RAM
-- JavaScript exercises work on all devices
+- JavaScript exercises work on all devices (Though there is no Javascript exercise in MVP)
 
 ---
 
@@ -99,9 +79,9 @@ All critical issues have been resolved.
 
 If you find a bug not listed here:
 1. Check if it's a known limitation above
-2. Open an issue at: [GitHub Issues URL]
+2. Open an issue at: [GitHub Issues URL] or can contact the teanm though a social like.
 3. Include: browser, device, steps to reproduce
 
 ---
 
-*Last updated: 2026-01-15*
+*Last updated: 2026-01-16*
